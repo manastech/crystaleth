@@ -1,0 +1,13 @@
+name: pampero
+version: 0.1.0
+
+authors:
+  - Ismael Bejarano <ismael.bejarano@manas.tech>
+
+targets:
+  pampero:
+    main: src/main.cr
+
+crystal: '>= 1.11.2'
+
+license: GPLv3
