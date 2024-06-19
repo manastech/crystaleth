@@ -1,17 +1,18 @@
 require "spec"
-require "../src/core/verkle_state"
+require "../src/core/verkle_state_manager"
+require "../src/common/types"
 
 address = Pampero::Address20.new(0)
 
-describe Pampero::VerkleState do
+describe Pampero::VerkleStateManager do
   it "init" do
-    v = Pampero::VerkleState.new
+    v = Pampero::VerkleStateManager.new
     v.should_not eq(nil)
   end
 
-  it "getAccount" do
-    v = Pampero::VerkleState.new
-    a = v.getAccount(address)
+  it "get_account" do
+    v = Pampero::VerkleStateManager.new
+    a = v.get_account(address)
     a.should_not eq(nil)
     a.version.should eq(0)
   end

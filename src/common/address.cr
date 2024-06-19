@@ -27,7 +27,6 @@ require "./types"
 
 require "big"
 
-
 module Pampero
   class InvalidAddressFormatException < Exception
     def initialize(format : String, addr : Address)
