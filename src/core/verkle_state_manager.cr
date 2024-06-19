@@ -10,7 +10,6 @@ module Pampero
   LEAF_NONCE        = 2u8
   LEAF_CODE_HASH    = 3u8
   LEAF_CODE_SIZE    = 4u8
-  LEAF_STORAGE_ROOT = 5u8
 
   class VerkleStateManager
     def initialize
@@ -42,7 +41,6 @@ module Pampero
       account.nonce = read_nonce(stem)
       account.code_hash = read_code_hash(stem)
       account.code_size = read_code_size(stem)
-      account.storage_root = read_storage_root(stem)
       account
     end
 
@@ -78,11 +76,6 @@ module Pampero
     def read_code_size(stem : Bytes32) : UInt256
       key = get_key(stem, LEAF_CODE_SIZE)
       Pampero.to_uint256(read_key(key))
-    end
-
-    def read_storage_root(stem : Bytes32) : Bytes32
-      key = get_key(stem, LEAF_STORAGE_ROOT)
-      read_key(key)
     end
 
     def get_key(stem : Bytes32, leaf : UInt8) : Bytes32

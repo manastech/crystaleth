@@ -14,6 +14,6 @@ describe Pampero::VerkleStateManager do
     v = Pampero::VerkleStateManager.new
     a = v.get_account(address)
     a.should_not eq(nil)
-    a.version.should eq(0)
+    a.version.should eq(Pampero::UInt256.new(0u8))
   end
 end
