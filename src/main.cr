@@ -1,5 +1,8 @@
+require "./core/verkle_crypto"
+
 module Pampero
   VERSION = "0.1.0"
 
-  puts "Hello"
+  a = VerkleCrypto.hash("hi")
+  puts a
 end
