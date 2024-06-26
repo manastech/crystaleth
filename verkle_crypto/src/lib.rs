@@ -38,11 +38,13 @@ impl Context {
 }
 
 
-#[no_mangle]
-pub extern "C" fn create_context() -> *const Context {
-  let context : Context = Context::new();
-  &context
-}
+// static context : Context = Context::new();
+
+// #[no_mangle]
+// pub extern "C" fn create_context() -> *const Context {
+//   context : Context = Context::new();
+//   &context
+// }
 
 #[repr(C)]
 pub struct Bytes64 {
@@ -55,19 +57,33 @@ pub struct Bytes32 {
 }
 
 #[no_mangle]
-pub extern "C" fn hash(p_context: *const Context, input : *const Bytes64, output: *mut Bytes32) {
+pub extern "C" fn hash(input : *const Bytes64, output: *mut Bytes32) {
   let data : [u8; 64];
-  let context : &Context;
+  // let context : &Context;
+  // let context : Context = Context::new();
+  let crs = CRS::default();
+  let committer = DefaultCommitter::new(&crs.G);
+
+  println!("0------------ here");
+
   unsafe {
-    context = &*p_context;
+    // context = &*p_context;
     data = (*input).data;
   }
-  let result = hash_safe(&context, data);
+
+  println!("1------------ we {}", data[23]);
+
+  let result = hash_safe(&committer, data);
+
+  println!("2------------ go {}", result[22]);
+
   unsafe {
     (*output).data = result;
   }
+
+  println!("3------------ here");
 }
 
-fn hash_safe(context: &Context, input : [u8; 64]) -> [u8; 32] {
-  verkle_spec::hash64(&context.committer, input).to_fixed_bytes()
+fn hash_safe(committer: &DefaultCommitter, input : [u8; 64]) -> [u8; 32] {
+  verkle_spec::hash64(&committer, input).to_fixed_bytes()
 }
