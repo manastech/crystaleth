@@ -37,11 +37,37 @@ impl Context {
   }
 }
 
+
 #[no_mangle]
-pub extern "C" fn hash(context: &Context, input : [u8; 64]) -> [u8; 32] {
-  verkle_spec::hash64(&context.committer, input).to_fixed_bytes()
+pub extern "C" fn create_context() -> *const Context {
+  let context : Context = Context::new();
+  &context
 }
 
-fn hash(context: &Context, input : [u8; 64]) -> [u8; 32] {
+#[repr(C)]
+pub struct Bytes64 {
+  data: [u8; 64]
+}
+
+#[repr(C)]
+pub struct Bytes32 {
+  data: [u8; 32]
+}
+
+#[no_mangle]
+pub extern "C" fn hash(p_context: *const Context, input : *const Bytes64, output: *mut Bytes32) {
+  let data : [u8; 64];
+  let context : &Context;
+  unsafe {
+    context = &*p_context;
+    data = (*input).data;
+  }
+  let result = hash_safe(&context, data);
+  unsafe {
+    (*output).data = result;
+  }
+}
+
+fn hash_safe(context: &Context, input : [u8; 64]) -> [u8; 32] {
   verkle_spec::hash64(&context.committer, input).to_fixed_bytes()
 }

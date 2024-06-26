@@ -2,13 +2,15 @@ require "../common/types"
 
 @[Link("verkle_crypto")]
 lib VerkleCrypto
-  fun hash(data : UInt8*) : UInt8*
+  fun create_context() : UInt8*
+  fun hash(context : UInt8*, data : UInt8*, output : UInt8*)
 end
 
 
 module Pampero
   def self.hash(data : Array(UInt8)) : Bytes32
-    result = VerkleCrypto.hash(data)
+    context = VerkleCrypto.create_context()
+    result = VerkleCrypto.hash(context, data)
     Bytes32.new(0)
   end
 end
