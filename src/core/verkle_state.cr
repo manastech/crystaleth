@@ -7,7 +7,7 @@ module Pampero
     end
 
     def read_key(key : Bytes32) : Bytes32
-      @state.fetch(key, Bytes32.new(0u8))
+      @state.fetch key, Bytes32.new(0_u8)
     end
   end
 end

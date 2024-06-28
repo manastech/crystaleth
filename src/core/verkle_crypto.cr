@@ -2,16 +2,16 @@ require "../common/types"
 
 @[Link("verkle_crypto")]
 lib VerkleCrypto
-  # fun create_context() : Void*
   fun hash(data : UInt8*, output : UInt8*)
 end
 
 
 module Pampero
-  def self.hash(data : StaticArray(UInt8, 64)) : Bytes32
-    # context = VerkleCrypto.create_context()
-    output = uninitialized Bytes32
-    VerkleCrypto.hash(data, output.@data.to_unsafe)
-    output
+  module Crypto
+    def self.hash(input : Bytes64) : Bytes32
+      output = uninitialized Bytes32
+      VerkleCrypto.hash input.@data.to_unsafe, output.@data.to_unsafe
+      output
+    end
   end
 end

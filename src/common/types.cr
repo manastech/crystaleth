@@ -1,9 +1,15 @@
 module Pampero
   alias Address20 = StaticArray(UInt8, 20)
   alias Address32 = StaticArray(UInt8, 32)
-  # alias Bytes32 = StaticArray(UInt8, 32)
-  alias Bytes64 = StaticArray(UInt8, 64)
   alias UInt256 = StaticArray(UInt128, 2)
+
+  # struct Address20
+  #   @data = StaticArray(UInt8, 20)
+  # end
+
+  # struct Address32
+  #   @data = StaticArray(UInt8, 32)
+  # end
 
   struct Bytes32
     @data : StaticArray(UInt8, 32)
@@ -11,24 +17,55 @@ module Pampero
     def initialize(val : UInt8 = 0_u8)
       @data = StaticArray(UInt8, 32).new val
     end
+
+    def initialize(data : StaticArray(UInt8, 32))
+      @data = data.clone
+    end
+
+    def initialize(val : UInt64)
+      @data = uninitialized StaticArray(UInt8, 32)
+      i = 31
+      while i >= 0
+        @data[i] = (val & 0xFF).to_u8
+        val = val >> 8
+        i -= 1
+      end
+    end
+
+    def initialize(str : String)
+      @data = uninitialized StaticArray(UInt8, 32)
+      str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
+      if str.size != 64
+        raise "Invalid format"
+      end
+      32.times do |i|
+        @data[i] = str[2*i..2*i+1].to_u8(16)
+      end
+    end
+
+    def to_uint256 : UInt256
+      result = UInt256.new 0_u128
+      16.times do |i|
+        result[0] = result[0] * 256_u128 + @data[i]
+        result[1] = result[1] * 256_u128 + @data[16 + i]
+      end
+      result
+    end
   end
 
-  def self.to_bytes32(val : UInt64) : Bytes32
-    result = Bytes32.new(0u8)
-    i = 31
-    while val > 0 && i >= 0
-      result[i] = (val & 0xFF).to_u8
-      val = val >> 8
-    end
-    result
-  end
+  struct Bytes64
+    @data : StaticArray(UInt8, 64)
 
-  def self.to_uint256(val : Bytes32) : UInt256
-    result = UInt256.new(0u128)
-    16.times do |i|
-      result[0] = result[0] * 256u128 + val[i]
-      result[1] = result[1] * 256u128 + val[16 + i]
+    def initialize(val : UInt8 = 0_u8)
+      @data = StaticArray(UInt8, 64).new val
     end
-    result
+
+    def initialize(a : StaticArray(UInt8, 32), b : StaticArray(UInt8, 32))
+      @data = uninitialized StaticArray(UInt8, 64)
+      32.times do |i|
+        @data[i] = a[i]
+        @data[32 + i] = b[i]
+      end
+    end
   end
 end
