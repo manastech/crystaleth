@@ -1,4 +1,5 @@
 require "../models/account"
+require "../models/verkle_execution_witness"
 require "../common/address"
 require "../common/types"
 require "../core/verkle_crypto"
@@ -14,6 +15,10 @@ module Pampero
   class VerkleStateManager
     def initialize
       @state = VerkleState.new
+    end
+
+    def initVerkleExecutionWitness(executionWitness : VerkleExecutionWitness)
+      @state.initVerkleExecutionWitness executionWitness
     end
 
     def get_account(address : Address20)

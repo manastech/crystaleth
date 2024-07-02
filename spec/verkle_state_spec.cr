@@ -1,19 +1,16 @@
 require "spec"
-require "../src/core/verkle_state_manager"
-require "../src/common/types"
+require "json"
+require "../src/core/verkle_state"
+require "../src/models/verkle_execution_witness"
+require "../src/models/block"
 
-address = Pampero::Address20.new 0_u8
+describe Pampero::VerkleState do
+  it "executionWitness" do
+    content = File.read(File.join(File.dirname(__FILE__), "data", "verkleKaustinen6Block72.json"))
+    block = Pampero::Block.from_json(content)
+    execution_witness = block.execution_witness
 
-describe Pampero::VerkleStateManager do
-  it "init" do
-    v = Pampero::VerkleStateManager.new
-    v.should_not eq(nil)
-  end
-
-  it "get_account" do
-    v = Pampero::VerkleStateManager.new
-    a = v.get_account address
-    a.should_not eq(nil)
-    a.version.should eq(Pampero::UInt256.new(0_u8))
+    state = Pampero::VerkleState.new
+    state.init_execution_witness execution_witness
   end
 end
