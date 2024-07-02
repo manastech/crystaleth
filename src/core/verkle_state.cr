@@ -14,14 +14,13 @@ module Pampero
           key = Bytes32.new sprintf("%s%02x", stem, suffix)
           current_value = suffix_diff.current_value
           # new_value = suffix_diff.new_value
-          if current_value != nil
-            @state[key] = Bytes32.new(current_value) if current_value
+          unless current_value.nil?
+            @state[key] = Bytes32.new(current_value)
           else
             @state.delete key
           end
         end
       end
-      print @state
     end
 
     def read_key(key : Bytes32) : Bytes32

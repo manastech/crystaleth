@@ -51,6 +51,24 @@ module Pampero
       end
       result
     end
+
+    def to_hex : String
+      str = String.build do |str|
+        str << "0x"
+        32.times do |i|
+          str << sprintf("%02x", @data[i])
+        end
+      end
+      str
+    end
+
+    def to_s : String
+      to_hex()
+    end
+
+    def inspect : String
+      to_hex()
+    end
   end
 
   struct Bytes64
