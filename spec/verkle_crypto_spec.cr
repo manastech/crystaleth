@@ -9,6 +9,7 @@ describe Pampero::Crypto do
     expected = Pampero::Bytes32.new "0x1a100684fd68185060405f3f160e4bb6e034194336b547bdae323f888d533207"
 
     result = Pampero::Crypto.hash zero
+
     result.should eq(expected)
   end
 end

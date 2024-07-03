@@ -27,6 +27,7 @@ module Pampero
       read_account(stem)
     end
 
+    # The stem are first 31 bytes
     def get_stem(address : Address20, treeIndex : UInt64) : Bytes32
       address32 = Address32.new 0_u8
 
@@ -36,7 +37,7 @@ module Pampero
 
       index = Bytes32.new treeIndex
 
-      get_tree_key address32, index
+      get_tree_key address32, index, 0_u8
     end
 
     def read_account(stem : Bytes32)
@@ -49,9 +50,11 @@ module Pampero
       account
     end
 
-    def get_tree_key(address : Address32, treeIndex : Bytes32) : Bytes32
+    def get_tree_key(address : Address32, treeIndex : Bytes32, subIndex : UInt8) : Bytes32
       data = Bytes64.new address, treeIndex.@data
-      Pampero::Crypto.hash data
+      key = Pampero::Crypto.hash data
+      key.@data[31] = subIndex
+      key
     end
 
     def read_version(stem : Bytes32) : UInt256
