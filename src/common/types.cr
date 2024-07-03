@@ -1,15 +1,28 @@
+require "big"
+
 module Pampero
-  alias Address20 = StaticArray(UInt8, 20)
   alias Address32 = StaticArray(UInt8, 32)
-  alias UInt256 = StaticArray(UInt128, 2)
+  # Integers are little endian
+  alias UInt256 = BigInt
 
-  # struct Address20
-  #   @data = StaticArray(UInt8, 20)
-  # end
+  struct Address20
+    @data : StaticArray(UInt8, 20)
 
-  # struct Address32
-  #   @data = StaticArray(UInt8, 32)
-  # end
+    def initialize(val : UInt8 = 0_u8)
+      @data = StaticArray(UInt8, 20).new val
+    end
+
+    def initialize(str : String)
+      @data = uninitialized StaticArray(UInt8, 20)
+      str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
+      if str.size != 40
+        raise "Invalid format"
+      end
+      20.times do |i|
+        @data[i] = str[2*i..2*i+1].to_u8(16)
+      end
+    end
+  end
 
   struct Bytes32
     @data : StaticArray(UInt8, 32)
@@ -22,11 +35,11 @@ module Pampero
       @data = data.clone
     end
 
-    def initialize(val : UInt64)
+    def initialize(val : BigInt | UInt64)
       @data = uninitialized StaticArray(UInt8, 32)
       i = 31
       while i >= 0
-        @data[i] = (val & 0xFF).to_u8
+        @data[31 - i] = (val & 0xFF).to_u8
         val = val >> 8
         i -= 1
       end
@@ -44,10 +57,9 @@ module Pampero
     end
 
     def to_uint256 : UInt256
-      result = UInt256.new 0_u128
-      16.times do |i|
-        result[0] = result[0] * 256_u128 + @data[i]
-        result[1] = result[1] * 256_u128 + @data[16 + i]
+      result = BigInt.new 0
+      32.times do |i|
+        result = result * 256 + @data[31-i]
       end
       result
     end

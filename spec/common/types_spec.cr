@@ -1,4 +1,5 @@
 require "spec"
+require "big"
 require "../../src/common/types"
 
 describe Pampero::Bytes32 do
@@ -14,6 +15,14 @@ describe Pampero::Bytes32 do
   it "to_s" do
     expected = data
     bytes = Pampero::Bytes32.new data
-    bytes.to_s.should eq(expected)
+    result = bytes.to_s
+    result.should eq(expected)
+  end
+
+  it "to_uint256" do
+    expected = BigInt.new "52435875175126190479447740508185965837690552500527637822603658699938581184513"
+    bytes = Pampero::Bytes32.new BigInt.new("52435875175126190479447740508185965837690552500527637822603658699938581184513")
+    result = bytes.to_uint256
+    result.should eq(expected)
   end
 end

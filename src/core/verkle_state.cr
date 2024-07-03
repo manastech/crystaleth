@@ -13,7 +13,6 @@ module Pampero
           suffix = suffix_diff.suffix
           key = Bytes32.new sprintf("%s%02x", stem, suffix)
           current_value = suffix_diff.current_value
-          # new_value = suffix_diff.new_value
           unless current_value.nil?
             @state[key] = Bytes32.new(current_value)
           else

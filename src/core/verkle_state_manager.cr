@@ -17,8 +17,8 @@ module Pampero
       @state = VerkleState.new
     end
 
-    def initVerkleExecutionWitness(executionWitness : VerkleExecutionWitness)
-      @state.initVerkleExecutionWitness executionWitness
+    def init_execution_witness(execution_witness : VerkleExecutionWitness)
+      @state.init_execution_witness execution_witness
     end
 
     def get_account(address : Address20)
@@ -31,7 +31,7 @@ module Pampero
       address32 = Address32.new 0_u8
 
       20.times do |i|
-        address32[12 + i] = address[i]
+        address32[12 + i] = address.@data[i]
       end
 
       index = Bytes32.new treeIndex
