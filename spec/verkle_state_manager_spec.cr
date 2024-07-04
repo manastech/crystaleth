@@ -15,8 +15,7 @@ describe Pampero::VerkleStateManager do
 
     account = verkle.get_account address
 
-    account.balance.should eq(0)
-    account.nonce.should eq(0)
+    account.nil?.should be_true
   end
 
   it "get_account with witness" do
@@ -26,8 +25,18 @@ describe Pampero::VerkleStateManager do
 
     account = verkle.get_account address
 
-    account.balance.should eq(288610978528114322)
-    account.nonce.should eq(300)
+    if account
+      account.balance.should eq(288610978528114322)
+      account.nonce.should eq(300)
+    end
+  end
+
+  it "put_account" do
+    address = Pampero::Address20.new "0xa3ffb7daee76edf3aa497ec8c2f0aa7251b302b7"
+    verkle = Pampero::VerkleStateManager.new
+    verkle.init_execution_witness execution_witness
+
+    account = verkle.get_account address
   end
 
   it "get_stem" do

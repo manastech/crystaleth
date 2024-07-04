@@ -21,10 +21,27 @@ module Pampero
       @state.init_execution_witness execution_witness
     end
 
-    def get_account(address : Address20)
+    def get_account(address : Address20) : Account?
       stem = get_stem address, 0_u64
 
-      read_account(stem)
+      result = read_account(stem)
+
+      if (version = result[:version]).nil? ||
+        (balance = result[:balance]).nil? ||
+        (nonce = result[:nonce]).nil? ||
+        (code_hash = result[:code_hash]).nil? ||
+        (code_size = result[:code_size]).nil?
+        return nil
+      end
+
+      account = Account.new
+      account.version = version
+      account.balance = balance
+      account.nonce = nonce
+      account.code_hash = code_hash
+      account.code_size = code_size
+
+      account
     end
 
     # The stem are first 31 bytes
@@ -41,13 +58,13 @@ module Pampero
     end
 
     def read_account(stem : Bytes32)
-      account = Account.new
-      account.version = read_version stem
-      account.balance = read_balance stem
-      account.nonce = read_nonce stem
-      account.code_hash = read_code_hash stem
-      account.code_size = read_code_size stem
-      account
+      {
+        version: read_version(stem),
+        balance: read_balance(stem),
+        nonce: read_nonce(stem),
+        code_hash: read_code_hash(stem),
+        code_size: read_code_size(stem)
+      }
     end
 
     def get_tree_key(address : Address32, treeIndex : Bytes32, subIndex : UInt8) : Bytes32
@@ -57,38 +74,50 @@ module Pampero
       key
     end
 
-    def read_version(stem : Bytes32) : UInt256
+    def read_version(stem : Bytes32) : UInt256?
       key = get_key stem, LEAF_VERSION
-      read_key(key).to_uint256
+      if result = read_key(key)
+        result = result.to_uint256
+      end
+      result
     end
 
-    def read_balance(stem : Bytes32) : UInt256
+    def read_balance(stem : Bytes32) : UInt256?
       key = get_key stem, LEAF_BALANCE
-      read_key(key).to_uint256
+      if result = read_key(key)
+        result = result.to_uint256
+      end
+      result
     end
 
-    def read_nonce(stem : Bytes32) : UInt256
+    def read_nonce(stem : Bytes32) : UInt256?
       key = get_key stem, LEAF_NONCE
-      read_key(key).to_uint256
+      if result = read_key(key)
+        result = result.to_uint256
+      end
+      result
     end
 
-    def read_code_hash(stem : Bytes32) : Bytes32
+    def read_code_hash(stem : Bytes32) : Bytes32?
       key = get_key stem, LEAF_CODE_HASH
       read_key(key)
     end
 
-    def read_code_size(stem : Bytes32) : UInt256
+    def read_code_size(stem : Bytes32) : UInt256?
       key = get_key stem, LEAF_CODE_SIZE
-      read_key(key).to_uint256
+      if result = read_key(key)
+        result = result.to_uint256
+      end
+      result
     end
 
     def get_key(stem : Bytes32, leaf : UInt8) : Bytes32
-      data = Bytes32.new stem.@data
-      data.@data[31] = leaf
-      data
+      key = Bytes32.new stem.@data
+      key.@data[31] = leaf
+      key
     end
 
-    def read_key(key : Bytes32) : Bytes32
+    def read_key(key : Bytes32) : Bytes32?
       @state.read_key key
     end
   end
