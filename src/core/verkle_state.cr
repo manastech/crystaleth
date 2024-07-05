@@ -25,5 +25,13 @@ module Pampero
     def read_key(key : Bytes32) : Bytes32?
       @state.fetch key, nil
     end
+
+    def write_key(key : Bytes32, data : Bytes32?)
+      unless data.nil?
+        @state[key] = data
+      else
+        @state.delete key
+      end
+    end
   end
 end

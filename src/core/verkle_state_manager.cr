@@ -26,11 +26,14 @@ module Pampero
 
       result = read_account(stem)
 
-      if (version = result[:version]).nil? ||
-        (balance = result[:balance]).nil? ||
-        (nonce = result[:nonce]).nil? ||
-        (code_hash = result[:code_hash]).nil? ||
-        (code_size = result[:code_size]).nil?
+      version = result[:version]
+      balance = result[:balance]
+      nonce = result[:nonce]
+      code_hash = result[:code_hash]
+      code_size = result[:code_size]
+
+      # If at least one of the fields is not nil we assume the account exists
+      if version.nil? && balance.nil? && nonce.nil? && code_hash.nil? && code_size.nil?
         return nil
       end
 
@@ -42,6 +45,14 @@ module Pampero
       account.code_size = code_size
 
       account
+    end
+
+    def put_account(address : Address20, account : Account)
+      stem = get_stem address, 0_u64
+
+      write_balance stem, account.balance
+      write_nonce stem, account.nonce
+      write_code_hash stem, account.code_hash
     end
 
     # The stem are first 31 bytes
@@ -59,11 +70,11 @@ module Pampero
 
     def read_account(stem : Bytes32)
       {
-        version: read_version(stem),
-        balance: read_balance(stem),
-        nonce: read_nonce(stem),
+        version:   read_version(stem),
+        balance:   read_balance(stem),
+        nonce:     read_nonce(stem),
         code_hash: read_code_hash(stem),
-        code_size: read_code_size(stem)
+        code_size: read_code_size(stem),
       }
     end
 
@@ -74,51 +85,78 @@ module Pampero
       key
     end
 
-    def read_version(stem : Bytes32) : UInt256?
-      key = get_key stem, LEAF_VERSION
-      if result = read_key(key)
-        result = result.to_uint256
-      end
-      result
-    end
-
-    def read_balance(stem : Bytes32) : UInt256?
-      key = get_key stem, LEAF_BALANCE
-      if result = read_key(key)
-        result = result.to_uint256
-      end
-      result
-    end
-
-    def read_nonce(stem : Bytes32) : UInt256?
-      key = get_key stem, LEAF_NONCE
-      if result = read_key(key)
-        result = result.to_uint256
-      end
-      result
-    end
-
-    def read_code_hash(stem : Bytes32) : Bytes32?
-      key = get_key stem, LEAF_CODE_HASH
-      read_key(key)
-    end
-
-    def read_code_size(stem : Bytes32) : UInt256?
-      key = get_key stem, LEAF_CODE_SIZE
-      if result = read_key(key)
-        result = result.to_uint256
-      end
-      result
-    end
-
     def get_key(stem : Bytes32, leaf : UInt8) : Bytes32
       key = Bytes32.new stem.@data
       key.@data[31] = leaf
       key
     end
 
+    def read_version(stem : Bytes32) : UInt256?
+      key = get_key stem, LEAF_VERSION
+      read_uint256(key)
+    end
+
+    def read_balance(stem : Bytes32) : UInt256?
+      key = get_key stem, LEAF_BALANCE
+      read_uint256(key)
+    end
+
+    def read_nonce(stem : Bytes32) : UInt256?
+      key = get_key stem, LEAF_NONCE
+      read_uint256(key)
+    end
+
+    def read_code_hash(stem : Bytes32) : Bytes32?
+      key = get_key stem, LEAF_CODE_HASH
+      read_bytes32(key)
+    end
+
+    def read_code_size(stem : Bytes32) : UInt256?
+      key = get_key stem, LEAF_CODE_SIZE
+      read_uint256(key)
+    end
+
+    def write_balance(stem : Bytes32, balance : UInt256?)
+      key = get_key stem, LEAF_BALANCE
+      write_uint256 key, balance
+    end
+
+    def write_nonce(stem : Bytes32, nonce : UInt256?)
+      key = get_key stem, LEAF_NONCE
+      write_uint256 key, nonce
+    end
+
+    def write_code_hash(stem : Bytes32, code_hash : Bytes32?)
+      key = get_key stem, LEAF_BALANCE
+      write_bytes32 key, code_hash
+    end
+
     def read_key(key : Bytes32) : Bytes32?
       @state.read_key key
+    end
+
+    def read_bytes32(key : Bytes32) : Bytes32?
+      read_key(key)
+    end
+
+    def read_uint256(key : Bytes32) : UInt256?
+      if result = read_key(key)
+        result = result.to_uint256
+      end
+      result
+    end
+
+    def write_key(key : Bytes32, data : Bytes32?)
+      @state.write_key key, data
+    end
+
+    def write_bytes32(key : Bytes32, data : Bytes32?)
+      write_key key, data
+    end
+
+    def write_uint256(key : Bytes32, value : UInt256?)
+      data = Bytes32.new(value) unless value.nil?
+      write_key key, data
     end
   end
 end

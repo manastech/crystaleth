@@ -37,6 +37,15 @@ describe Pampero::VerkleStateManager do
     verkle.init_execution_witness execution_witness
 
     account = verkle.get_account address
+    account.nil?.should be_true
+
+    account = Pampero::Account.new
+    account.nonce = BigInt.new 2
+
+    verkle.put_account address, account
+
+    result = verkle.get_account address
+    result.should eq(account)
   end
 
   it "get_stem" do
