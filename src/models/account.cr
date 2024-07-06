@@ -9,13 +9,14 @@ module Pampero
     property code_size : UInt256?
     property storage_root : Bytes32?
 
-    def initialize
-      # @version = UInt256.new 0
-      # @balance = UInt256.new 0
-      # @nonce = UInt256.new 0
-      # @code_hash = Bytes32.new 0_u8
-      # @code_size = UInt256.new 0_u8
-      # @storage_root = Bytes32.new 0_u8
+    def initialize(
+      @version : UInt256? = nil,
+      @balance : UInt256? = nil,
+      @nonce : UInt256? = nil,
+      @code_hash : Bytes32? = nil,
+      @code_size : UInt256? = nil,
+      @storage_root : Bytes32? = nil
+    )
     end
   end
 end

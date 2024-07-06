@@ -25,6 +25,7 @@ describe Pampero::VerkleStateManager do
 
     account = verkle.get_account address
 
+    account.nil?.should be_false
     if account
       account.balance.should eq(288610978528114322)
       account.nonce.should eq(300)
@@ -34,18 +35,39 @@ describe Pampero::VerkleStateManager do
   it "put_account" do
     address = Pampero::Address20.new "0xa3ffb7daee76edf3aa497ec8c2f0aa7251b302b7"
     verkle = Pampero::VerkleStateManager.new
-    verkle.init_execution_witness execution_witness
 
     account = verkle.get_account address
     account.nil?.should be_true
 
-    account = Pampero::Account.new
-    account.nonce = BigInt.new 2
+    account = Pampero::Account.new(nonce: BigInt.new(2))
 
     verkle.put_account address, account
 
     result = verkle.get_account address
+
+    result.nil?.should be_false
     result.should eq(account)
+  end
+
+  it "delete_account" do
+    address = Pampero::Address20.new "0xa3ffb7daee76edf3aa497ec8c2f0aa7251b302b7"
+    verkle = Pampero::VerkleStateManager.new
+
+    account = verkle.get_account address
+    account.nil?.should be_true
+
+    account = Pampero::Account.new(nonce: BigInt.new(2))
+
+    verkle.put_account address, account
+
+    result = verkle.get_account address
+
+    result.nil?.should be_false
+
+    verkle.delete_account address
+
+    result = verkle.get_account address
+    result.nil?.should be_true
   end
 
   it "get_stem" do

@@ -50,9 +50,21 @@ module Pampero
     def put_account(address : Address20, account : Account)
       stem = get_stem address, 0_u64
 
+      write_version stem, account.version
       write_balance stem, account.balance
       write_nonce stem, account.nonce
       write_code_hash stem, account.code_hash
+      write_code_size stem, account.code_size
+    end
+
+    def delete_account(address : Address20)
+      stem = get_stem address, 0_u64
+
+      write_version stem, nil
+      write_balance stem, nil
+      write_nonce stem, nil
+      write_code_hash stem, nil
+      write_code_size stem, nil
     end
 
     # The stem are first 31 bytes
@@ -116,6 +128,11 @@ module Pampero
       read_uint256(key)
     end
 
+    def write_version(stem : Bytes32, version : UInt256?)
+      key = get_key stem, LEAF_VERSION
+      write_uint256 key, version
+    end
+
     def write_balance(stem : Bytes32, balance : UInt256?)
       key = get_key stem, LEAF_BALANCE
       write_uint256 key, balance
@@ -129,6 +146,11 @@ module Pampero
     def write_code_hash(stem : Bytes32, code_hash : Bytes32?)
       key = get_key stem, LEAF_BALANCE
       write_bytes32 key, code_hash
+    end
+
+    def write_code_size(stem : Bytes32, code_size : UInt256?)
+      key = get_key stem, LEAF_CODE_SIZE
+      write_uint256 key, code_size
     end
 
     def read_key(key : Bytes32) : Bytes32?
