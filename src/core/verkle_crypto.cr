@@ -1,3 +1,4 @@
+require "sha3"
 require "../common/types"
 
 @[Link("verkle_crypto")]
@@ -12,6 +13,12 @@ module Pampero
       output = uninitialized Bytes32
       VerkleCrypto.hash input.@data.to_unsafe, output.@data.to_unsafe
       output
+    end
+
+    def self.keccak256(input : Bytes) : Bytes32
+      digest = Digest::Keccak3.new(256)
+      digest.update input
+      Bytes32.new digest.hexdigest
     end
   end
 end

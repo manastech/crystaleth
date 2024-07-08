@@ -90,6 +90,16 @@ module Pampero
       }
     end
 
+    def put_contract_code(address : Address20, value : Bytes)
+      code_hash = Pampero::Crypto.keccak256(value)
+
+      unless account = get_account(address)
+        account = Account.new
+      end
+      account.code_hash = code_hash
+      put_account address, account
+    end
+
     def get_tree_key(address : Address32, treeIndex : Bytes32, subIndex : UInt8) : Bytes32
       data = Bytes64.new address, treeIndex.@data
       key = Pampero::Crypto.hash data
@@ -144,7 +154,7 @@ module Pampero
     end
 
     def write_code_hash(stem : Bytes32, code_hash : Bytes32?)
-      key = get_key stem, LEAF_BALANCE
+      key = get_key stem, LEAF_CODE_HASH
       write_bytes32 key, code_hash
     end
 

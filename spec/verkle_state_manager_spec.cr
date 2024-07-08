@@ -65,6 +65,21 @@ describe Pampero::VerkleStateManager do
     result.should be_nil
   end
 
+  it "put_contract_code" do
+    keccack256_null = Pampero::Bytes32.new "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+    bytecode = Slice(UInt8).new(0)
+    verkle = Pampero::VerkleStateManager.new
+
+    verkle.put_contract_code address_empty, bytecode
+
+    account = verkle.get_account address_empty
+
+    account.should_not be_nil
+    if account
+      account.code_hash.should eq(keccack256_null)
+    end
+  end
+
   it "get_stem" do
     expected = "0x1540dfad7755b40be0768c6aa0a5096fbf0215e0e8cf354dd928a17834646600"
     address = Pampero::Address20.new "0x71562b71999873DB5b286dF957af199Ec94617f7"

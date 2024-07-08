@@ -12,4 +12,12 @@ describe Pampero::Crypto do
 
     result.should eq(expected)
   end
+
+  it "keccack" do
+    input = Slice(UInt8).new(0)
+    expected = Pampero::Bytes32.new "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+
+    result = Pampero::Crypto.keccak256 input
+    result.should eq(expected)
+  end
 end
