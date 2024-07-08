@@ -1,0 +1,6 @@
+version: 2.0
+shards:
+  sha3:
+    git: https://github.com/oscarbarrett/crystal-sha3.git
+    version: 0.3.2
+
