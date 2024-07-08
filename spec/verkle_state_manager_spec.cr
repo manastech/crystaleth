@@ -9,23 +9,25 @@ describe Pampero::VerkleStateManager do
   block = Pampero::Block.from_json(content)
   execution_witness = block.execution_witness
 
+  address = Pampero::Address20.new "0x6177843db3138ae69679a54b95cf345ed759450d"
+
+  address_empty = Pampero::Address20.new "0xa3ffb7daee76edf3aa497ec8c2f0aa7251b302b7"
+
   it "get_account" do
-    address = Pampero::Address20.new "0x6177843db3138ae69679a54b95cf345ed759450d"
     verkle = Pampero::VerkleStateManager.new
 
     account = verkle.get_account address
 
-    account.nil?.should be_true
+    account.should be_nil
   end
 
   it "get_account with witness" do
-    address = Pampero::Address20.new "0x6177843db3138ae69679a54b95cf345ed759450d"
     verkle = Pampero::VerkleStateManager.new
     verkle.init_execution_witness execution_witness
 
     account = verkle.get_account address
 
-    account.nil?.should be_false
+    account.should_not be_nil
     if account
       account.balance.should eq(288610978528114322)
       account.nonce.should eq(300)
@@ -33,41 +35,34 @@ describe Pampero::VerkleStateManager do
   end
 
   it "put_account" do
-    address = Pampero::Address20.new "0xa3ffb7daee76edf3aa497ec8c2f0aa7251b302b7"
     verkle = Pampero::VerkleStateManager.new
 
-    account = verkle.get_account address
-    account.nil?.should be_true
+    account = verkle.get_account address_empty
+    account.should be_nil
 
     account = Pampero::Account.new(nonce: BigInt.new(2))
 
-    verkle.put_account address, account
+    verkle.put_account address_empty, account
 
-    result = verkle.get_account address
+    result = verkle.get_account address_empty
 
-    result.nil?.should be_false
     result.should eq(account)
   end
 
   it "delete_account" do
-    address = Pampero::Address20.new "0xa3ffb7daee76edf3aa497ec8c2f0aa7251b302b7"
     verkle = Pampero::VerkleStateManager.new
-
-    account = verkle.get_account address
-    account.nil?.should be_true
 
     account = Pampero::Account.new(nonce: BigInt.new(2))
 
-    verkle.put_account address, account
+    verkle.put_account address_empty, account
 
-    result = verkle.get_account address
+    result = verkle.get_account address_empty
+    result.should_not be_nil
 
-    result.nil?.should be_false
+    verkle.delete_account address_empty
 
-    verkle.delete_account address
-
-    result = verkle.get_account address
-    result.nil?.should be_true
+    result = verkle.get_account address_empty
+    result.should be_nil
   end
 
   it "get_stem" do
