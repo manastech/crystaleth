@@ -6,11 +6,16 @@ require "../core/verkle_crypto"
 require "../core/verkle_state"
 
 module Pampero
-  LEAF_VERSION   = 0u8
-  LEAF_BALANCE   = 1u8
-  LEAF_NONCE     = 2u8
-  LEAF_CODE_HASH = 3u8
-  LEAF_CODE_SIZE = 4u8
+  LEAF_VERSION   = 0_u8
+  LEAF_BALANCE   = 1_u8
+  LEAF_NONCE     = 2_u8
+  LEAF_CODE_HASH = 3_u8
+  LEAF_CODE_SIZE = 4_u8
+
+  CODE_OFFSET       = 128_u64
+  VERKLE_NODE_WIDTH = 256_u64
+
+  CHUNK_LENGTH = 31_u64
 
   class VerkleStateManager
     def initialize
@@ -67,6 +72,34 @@ module Pampero
       write_code_size stem, nil
     end
 
+    def put_contract_code(address : Address20, value : Bytes)
+      code_hash = Pampero::Crypto.keccak256(value)
+
+      unless account = get_account(address)
+        account = Account.new
+      end
+      account.code_hash = code_hash
+      put_account address, account
+    end
+
+    def get_contract_code(address : Address20) : Bytes
+      unless (account = get_account(address)) && (code_size = account.code_size)
+        return Slice(UInt8).new 0
+      end
+
+      code_size = code_size.to_u64
+      chunks = (code_size + CHUNK_LENGTH - 1).tdiv(CHUNK_LENGTH)
+
+      bytecode = Slice(UInt8).new(code_size + CHUNK_LENGTH)
+
+      chunks.times do |i|
+        chunk = read_code_chunk address, i
+        (bytecode + i * CHUNK_LENGTH).copy_from chunk.@data.to_slice
+      end
+
+      bytecode[0...code_size]
+    end
+
     # The stem are first 31 bytes
     def get_stem(address : Address20, treeIndex : UInt64) : Bytes32
       address32 = Address32.new 0_u8
@@ -88,16 +121,6 @@ module Pampero
         code_hash: read_code_hash(stem),
         code_size: read_code_size(stem),
       }
-    end
-
-    def put_contract_code(address : Address20, value : Bytes)
-      code_hash = Pampero::Crypto.keccak256(value)
-
-      unless account = get_account(address)
-        account = Account.new
-      end
-      account.code_hash = code_hash
-      put_account address, account
     end
 
     def get_tree_key(address : Address32, treeIndex : Bytes32, subIndex : UInt8) : Bytes32
@@ -136,6 +159,16 @@ module Pampero
     def read_code_size(stem : Bytes32) : UInt256?
       key = get_key stem, LEAF_CODE_SIZE
       read_uint256(key)
+    end
+
+    def read_code_chunk(address : Address20, chunk_index : UInt64) : Bytes32
+      tree_index, sub_index = (CODE_OFFSET + chunk_index).divmod(VERKLE_NODE_WIDTH)
+      stem = get_stem address, tree_index
+      key = get_key stem, sub_index.to_u8
+      unless chunk = read_bytes32(key)
+        chunk = Bytes32.new 0xfe_u8
+      end
+      chunk
     end
 
     def write_version(stem : Bytes32, version : UInt256?)

@@ -80,6 +80,14 @@ describe Pampero::VerkleStateManager do
     end
   end
 
+  it "get_contract_code" do
+    verkle = Pampero::VerkleStateManager.new
+
+    result = verkle.get_contract_code address_empty
+    
+    result.should be_empty
+  end
+
   it "get_stem" do
     expected = "0x1540dfad7755b40be0768c6aa0a5096fbf0215e0e8cf354dd928a17834646600"
     address = Pampero::Address20.new "0x71562b71999873DB5b286dF957af199Ec94617f7"

@@ -1,4 +1,5 @@
 require "../common/types"
+require "../common/constants"
 
 module Pampero
   struct Account
@@ -17,6 +18,10 @@ module Pampero
       @code_size : UInt256? = nil,
       @storage_root : Bytes32? = nil
     )
+    end
+
+    def contract?
+      (@code_hash != nil && @code_hash != Pampero::KECCAK256_NULL) || (@code_size != nil && @code_size != 0)
     end
   end
 end
