@@ -1,0 +1,18 @@
+name: pampero
+version: 0.1.0
+
+authors:
+  - Ismael Bejarano <ismael.bejarano@manas.tech>
+
+targets:
+  pampero:
+    main: src/main.cr
+
+dependencies:
+  sha3:
+    github: OscarBarrett/crystal-sha3
+    version: ~> 0.3
+
+crystal: '>= 1.11.2'
+
+license: GPLv3
