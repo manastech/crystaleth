@@ -66,7 +66,7 @@ describe Pampero::VerkleStateManager do
   end
 
   it "put_contract_code" do
-    keccack256_null = Pampero::Bytes32.new "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+    keccack256_null = Pampero::Bytes32.new Pampero::KECCAK256_NULL_S
     bytecode = Slice(UInt8).new(0)
     verkle = Pampero::VerkleStateManager.new
 
@@ -88,12 +88,41 @@ describe Pampero::VerkleStateManager do
     result.should be_empty
   end
 
+  it "get_contract_storage" do
+    key1 = Pampero::Bytes32.new "0000000000000000000000000000000000000000000000000000000000000000"
+    key2 = Pampero::Bytes32.new "0000000000000000000000000000000000000000000000000000000000000001"
+
+    verkle = Pampero::VerkleStateManager.new
+
+    result1 = verkle.get_contract_storage address, key1
+    result2 = verkle.get_contract_storage address, key2
+
+    result1.should be_nil
+    result2.should be_nil
+  end
+
+  it "put_contract_storage" do
+    key1 = Pampero::Bytes32.new "0000000000000000000000000000000000000000000000000000000000000000"
+    key2 = Pampero::Bytes32.new "0000000000000000000000000000000000000000000000000000000000000001"
+
+    verkle = Pampero::VerkleStateManager.new
+
+    verkle.put_contract_storage address, key1, key2
+    verkle.put_contract_storage address, key2, key2
+
+    result1 = verkle.get_contract_storage address, key1
+    result2 = verkle.get_contract_storage address, key2
+
+    result1.should eq(key2)
+    result2.should eq(key2)
+  end
+
   it "get_stem" do
     expected = "0x1540dfad7755b40be0768c6aa0a5096fbf0215e0e8cf354dd928a17834646600"
     address = Pampero::Address20.new "0x71562b71999873DB5b286dF957af199Ec94617f7"
     verkle = Pampero::VerkleStateManager.new
 
-    stem = verkle.get_stem address, 0_u64
+    stem = verkle.get_stem(address, Pampero::UInt256.new(0))
 
     stem.to_s.should eq(expected)
   end

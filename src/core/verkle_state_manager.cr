@@ -12,10 +12,13 @@ module Pampero
   LEAF_CODE_HASH = 3_u8
   LEAF_CODE_SIZE = 4_u8
 
-  CODE_OFFSET       = 128_u64
-  VERKLE_NODE_WIDTH = 256_u64
+  CODE_OFFSET       = BigInt.new(128)
+  VERKLE_NODE_WIDTH = BigInt.new(256)
 
-  CHUNK_LENGTH = 31_u64
+  HEADER_STORAGE_OFFSET = BigInt.new(64)
+  MAIN_STORAGE_OFFSET = VERKLE_NODE_WIDTH^31
+
+  CHUNK_LENGTH = BigInt.new(31)
 
   class VerkleStateManager
     def initialize
@@ -27,7 +30,7 @@ module Pampero
     end
 
     def get_account(address : Address20) : Account?
-      stem = get_stem address, 0_u64
+      stem = get_stem(address, UInt256.new(0))
 
       result = read_account(stem)
 
@@ -53,7 +56,7 @@ module Pampero
     end
 
     def put_account(address : Address20, account : Account)
-      stem = get_stem address, 0_u64
+      stem = get_stem(address, UInt256.new(0))
 
       write_version stem, account.version
       write_balance stem, account.balance
@@ -63,7 +66,7 @@ module Pampero
     end
 
     def delete_account(address : Address20)
-      stem = get_stem address, 0_u64
+      stem = get_stem(address, UInt256.new(0))
 
       write_version stem, nil
       write_balance stem, nil
@@ -93,15 +96,30 @@ module Pampero
       bytecode = Slice(UInt8).new(code_size + CHUNK_LENGTH)
 
       chunks.times do |i|
-        chunk = read_code_chunk address, i
+        chunk = read_code_chunk(address, UInt256.new(i))
         (bytecode + i * CHUNK_LENGTH).copy_from chunk.@data.to_slice
       end
 
       bytecode[0...code_size]
     end
 
+    def put_contract_storage(address : Address20, key : Bytes32, value : Bytes32)
+      storage_key = get_tree_storage_key(address, key.to_uint256)
+      write_bytes32(storage_key, value)
+    end
+
+    def get_contract_storage(address : Address20, key : Bytes32) : Bytes32?
+      storage_key = get_tree_storage_key(address, key.to_uint256)
+      read_bytes32(storage_key)
+    end
+
+    def clear_contract_storage(address : Address20, key : Bytes32)
+      storage_key = get_tree_storage_key(address, key.to_uint256)
+      write_bytes32(storage_key, KECCAK256_NULL)
+    end
+
     # The stem are first 31 bytes
-    def get_stem(address : Address20, treeIndex : UInt64) : Bytes32
+    def get_stem(address : Address20, treeIndex : UInt256) : Bytes32
       address32 = Address32.new 0_u8
 
       20.times do |i|
@@ -128,6 +146,16 @@ module Pampero
       key = Pampero::Crypto.hash data
       key.@data[31] = subIndex
       key
+    end
+
+    def get_tree_storage_key(address : Address20, storage_key : UInt256) : Bytes32
+      position = if storage_key < CODE_OFFSET - HEADER_STORAGE_OFFSET
+        HEADER_STORAGE_OFFSET + storage_key
+      else
+        MAIN_STORAGE_OFFSET + storage_key
+      end
+
+      calc_tree_key(address, position)
     end
 
     def get_key(stem : Bytes32, leaf : UInt8) : Bytes32
@@ -161,14 +189,19 @@ module Pampero
       read_uint256(key)
     end
 
-    def read_code_chunk(address : Address20, chunk_index : UInt64) : Bytes32
-      tree_index, sub_index = (CODE_OFFSET + chunk_index).divmod(VERKLE_NODE_WIDTH)
-      stem = get_stem address, tree_index
-      key = get_key stem, sub_index.to_u8
-      unless chunk = read_bytes32(key)
+    def read_code_chunk(address : Address20, chunk_index : UInt256) : Bytes32
+      chunk_key = calc_tree_key(address, CODE_OFFSET + chunk_index)
+      unless chunk = read_bytes32(chunk_key)
+        # Fill chunk with INVALID opcodes
         chunk = Bytes32.new 0xfe_u8
       end
       chunk
+    end
+
+    def calc_tree_key(address : Address20, offset : UInt256) : Bytes32
+      tree_index, sub_index = offset.divmod(VERKLE_NODE_WIDTH)
+      stem = get_stem(address, UInt256.new(tree_index))
+      get_key(stem, sub_index.to_u8)
     end
 
     def write_version(stem : Bytes32, version : UInt256?)
