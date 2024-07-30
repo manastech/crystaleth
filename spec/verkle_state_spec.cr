@@ -4,9 +4,15 @@ require "../src/core/verkle_state"
 require "../src/models/verkle_execution_witness"
 require "../src/models/block"
 
+struct TestBlock
+  include JSON::Serializable
+  property execution_witness : Pampero::VerkleExecutionWitness
+end
+
+
 describe Pampero::VerkleState do
   content = File.read(File.join(File.dirname(__FILE__), "data", "verkleKaustinen6Block72.json"))
-  block = Pampero::Block.from_json(content)
+  block = TestBlock.from_json(content)
   execution_witness = block.execution_witness
 
   key = Pampero::Bytes32.new "df67dea9181141d6255ac05c7ada5a590fb30a375023f16c31223f067319e303"
