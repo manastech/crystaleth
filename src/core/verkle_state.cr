@@ -11,10 +11,14 @@ module Pampero
         stem = state_diff.stem
         state_diff.suffix_diffs.map do |suffix_diff|
           suffix = suffix_diff.suffix
+          if suffix.is_a?(String)
+            suffix = suffix[2..].to_i(16)
+          end
           key = Bytes32.new sprintf("%s%02x", stem, suffix)
           current_value = suffix_diff.current_value
           unless current_value.nil?
-            @state[key] = Bytes32.new(current_value)
+             value = Bytes32.new(current_value.is_a?(String) ? current_value : current_value.value)
+             @state[key] = value
           else
             @state.delete key
           end
