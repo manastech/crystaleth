@@ -14,6 +14,7 @@ module Pampero
 
   struct Message
     include JSON::Serializable
+    property slot : String
     property body : Body
   end
 
