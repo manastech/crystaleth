@@ -12,6 +12,10 @@ dependencies:
   sha3:
     github: OscarBarrett/crystal-sha3
     version: ~> 0.3
+  dotenv:
+    github: gdotdesign/cr-dotenv
+  kemal:
+    github: kemalcr/kemal
 
 crystal: '>= 1.11.2'
 

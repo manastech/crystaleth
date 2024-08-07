@@ -1,0 +1,20 @@
+<h2>Block</h2>
+
+<table>
+  <tr>
+    <td>Slot:</td>
+    <td><%= block.data.message.slot %></td>
+  </tr>
+  <tr>
+    <td>Block:</td>
+    <td><%= payload.block_number %></td>
+  </tr>
+  <tr>
+    <td>Hash:</td>
+    <td><%= payload.block_hash %></td>
+  </tr>
+  <tr>
+    <td>Date:</td>
+    <td><%= Time.unix(payload.timestamp.to_i) %></td>
+  </tr>
+</table>

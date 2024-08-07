@@ -1,0 +1,32 @@
+:root {
+	--u1: 0.4rem;
+	--u2: calc(2 * var(--u1));
+	--u3: calc(3 * var(--u1));
+
+	--gray-1: #c3c3c3;	
+}
+
+pre {
+	white-space: pre-wrap;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+td, th {
+	font-family: monospace;
+	padding: var(--u1) var(--u2) var(--u1) var(--u2);
+}
+
+tr.stem td {
+	border-top: solid 0.1rem var(--gray-1);	
+}
+
+tr.stem td.suffix {
+	padding-top: var(--u3);
+}
+
+tr.stem-end td {
+	padding-bottom: var(--u3);
+}
