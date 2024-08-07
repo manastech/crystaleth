@@ -1,3 +1,10 @@
 module Pampero
-  BEACON_NODE = "https://beacon.verkle-gen-devnet-6.ethpandaops.io"
+
+  class Config
+    getter beacon_node : String
+
+    def initialize
+      @beacon_node = ENV["BEACON_NODE"] || ""
+    end
+  end
 end

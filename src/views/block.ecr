@@ -1,5 +1,7 @@
 <h2>Block</h2>
 
+<h3>Info</h3>
+
 <table>
   <tr>
     <td>Slot:</td>
@@ -17,4 +19,19 @@
     <td>Date:</td>
     <td><%= Time.unix(payload.timestamp.to_i) %></td>
   </tr>
+</table>
+
+<h3>Stateless</h3>
+
+<table>
+  <% verkle.@state.@state.each do |key, value| %>
+  <tr>
+    <td>Key:</td>
+    <td><%= key.to_s %></td>
+  </tr>
+  <tr>
+    <td>Value:</td>
+    <td><%= value.to_s %></td>
+  </tr>
+  <% end %>
 </table>
