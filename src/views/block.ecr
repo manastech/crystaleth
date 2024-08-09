@@ -2,6 +2,9 @@
 
 <h3>Info</h3>
 
+<a href="/block/<%= block.data.message.slot.to_i - 1 %>">Prev. Slot</a>
+<a href="/block/<%= block.data.message.slot.to_i + 1 %>">Next Slot</a>
+
 <table>
   <tr>
     <td>Slot:</td>
@@ -38,14 +41,14 @@
 
 <h3>Account</h3>
 
-<form action="/momo" x-data="AccountForm(<%= block.data.message.slot %>)" @submit.prevent="submitForm">
+<form x-data="AccountForm(<%= block.data.message.slot %>)" @submit.prevent="submitForm">
   <input type="hidden" name="slot" value="" x-model="formData.slot" />
   <div>
     <label>Address:</label>
     <input type="text" name="address" required x-model="formData.address" />
   </div>
   <button>Load</button>
-  <div x-show="formData.account">
+  <div x-show="formData.account" style="display: none">
     <table>
       <tr>
         <td>Version:</td>
@@ -64,5 +67,9 @@
         <td x-text="formData.account.code_hash"></td>
       </tr>
     </table>
+  </div>
+  <div x-show="formData.error">
+    <p>Failed to read address:</p>
+    <pre x-text="formData.error"></pre>
   </div>
 </form>

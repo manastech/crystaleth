@@ -19,22 +19,21 @@ get "/block/:slot" do |env|
     slot = "head"
   end
   response = HTTP::Client.get "#{config.beacon_node}/eth/v2/beacon/blocks/#{slot}"
-  # if response.status_code != 200
-  #   error = JSON.parse response.body
-  #   render "src/views/block.ecr", "src/views/layouts/layout.ecr"
-  #   return
-  # end
+  if response.status_code != 200
+    error = JSON.parse response.body
+    render "src/views/block-error.ecr", "src/views/layouts/layout.ecr"
+  else
+    content = response.body
+    block = Pampero::Block.from_json content
 
-  content = response.body
-  block = Pampero::Block.from_json content
+    payload = block.data.message.body.execution_payload
+    execution_witness = payload.execution_witness
 
-  payload = block.data.message.body.execution_payload
-  execution_witness = payload.execution_witness
+    verkle = Pampero::VerkleStateManager.new
+    verkle.init_execution_witness execution_witness
 
-  verkle = Pampero::VerkleStateManager.new
-  verkle.init_execution_witness execution_witness
-
-  render "src/views/block.ecr", "src/views/layouts/layout.ecr"
+    render "src/views/block.ecr", "src/views/layouts/layout.ecr"
+  end
 end
 
 get "/block/:slot/account/:address" do |env|
@@ -43,32 +42,25 @@ get "/block/:slot/account/:address" do |env|
     slot = "head"
   end
   response = HTTP::Client.get "#{config.beacon_node}/eth/v2/beacon/blocks/#{slot}"
-  # if response.status_code != 200
-  #   error = JSON.parse response.body
-  #   render "src/views/block.ecr", "src/views/layouts/layout.ecr"
-  #   return
-  # end
+  if response.status_code != 200
+    error = JSON.parse response.body
 
-  content = response.body
-  block = Pampero::Block.from_json content
+    error.to_json
+  else
+    content = response.body
+    block = Pampero::Block.from_json content
 
-  payload = block.data.message.body.execution_payload
-  execution_witness = payload.execution_witness
+    payload = block.data.message.body.execution_payload
+    execution_witness = payload.execution_witness
 
-  verkle = Pampero::VerkleStateManager.new
-  verkle.init_execution_witness execution_witness
+    verkle = Pampero::VerkleStateManager.new
+    verkle.init_execution_witness execution_witness
 
-  address = Pampero::Address20.new env.params.url["address"]
-  account = verkle.get_account(address) || {} of String => String
-  # # 
-  # account = Pampero::Account.new
-  # account.version = Pampero::UInt256.new(1_u8)
-  # account.balance = Pampero::UInt256.new(BigInt.new(10_u64)**18)
-  # account.nonce = Pampero::UInt256.new(120_u64)
-  # account.code_hash = Pampero::Bytes32.new("0x1540dfad7755b40be0768c6aa0a5096fbf0215e0e8cf354dd928a17834646600")
-  # account.code_size = Pampero::UInt256.new(0_u8)
+    address = Pampero::Address20.new env.params.url["address"]
+    account = verkle.get_account(address) || {} of String => String
 
-  account.to_json
+    account.to_json
+  end
 end
 
 Kemal.run
