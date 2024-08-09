@@ -3,6 +3,8 @@ require "../common/constants"
 
 module Pampero
   struct Account
+    include JSON::Serializable
+
     property version : UInt256?
     property balance : UInt256?
     property nonce : UInt256?

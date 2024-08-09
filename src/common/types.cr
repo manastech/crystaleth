@@ -81,6 +81,14 @@ module Pampero
     def inspect : String
       to_hex()
     end
+
+    def to_json(json : JSON::Builder) : Nil
+      json.string(to_hex())
+    end
+
+    def to_json_object_key : String
+      to_hex()
+    end
   end
 
   struct Bytes64

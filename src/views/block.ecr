@@ -35,3 +35,34 @@
   </tr>
   <% end %>
 </table>
+
+<h3>Account</h3>
+
+<form action="/momo" x-data="AccountForm(<%= block.data.message.slot %>)" @submit.prevent="submitForm">
+  <input type="hidden" name="slot" value="" x-model="formData.slot" />
+  <div>
+    <label>Address:</label>
+    <input type="text" name="address" required x-model="formData.address" />
+  </div>
+  <button>Load</button>
+  <div x-show="formData.account">
+    <table>
+      <tr>
+        <td>Version:</td>
+        <td x-text="formData.account.version"></td>
+      </tr>
+      <tr>
+        <td>Balance:</td>
+        <td x-text="formData.account.balance"></td>
+      </tr>
+      <tr>
+        <td>Nonce:</td>
+        <td x-text="formData.account.nonce"></td>
+      </tr>
+      <tr>
+        <td>Code hash:</td>
+        <td x-text="formData.account.code_hash"></td>
+      </tr>
+    </table>
+  </div>
+</form>
