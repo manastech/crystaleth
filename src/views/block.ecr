@@ -32,15 +32,17 @@
 <h3>Stateless</h3>
 
 <table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Value</th>
+    </tr>
+  </thead>
   <% verkle.@state.@state.each do |key, value| %>
-  <tr>
-    <td>Key:</td>
-    <td><%= key.to_s %></td>
-  </tr>
-  <tr>
-    <td>Value:</td>
-    <td><%= value.to_s %></td>
-  </tr>
+    <tr>
+      <td><%= key.to_s %></td>
+      <td><%= value.to_s %></td>
+    </tr>
   <% end %>
 </table>
 
@@ -48,17 +50,17 @@
 
 <form x-data="AccountForm(<%= block.data.message.slot %>)" @submit.prevent="submitForm">
   <input type="hidden" name="slot" value="" x-model="formData.slot" />
-  <div>
-    <div>
+  <div class="form-inputs">
+    <div class="form-inputs">
       <label>Address:</label>
       <input type="text" name="address" required x-model="formData.address" />
     </div>
-    <div>
+    <div class="form-inputs">
       <label>Storage:</label>
       <input type="text" name="storageKey" x-model="formData.storageKey" />
     </div>
+    <button :disabled="formLoading" x-text="submitText"></button>
   </div>
-  <button :disabled="formLoading" x-text="submitText"></button>
   <div x-show="formData.account" style="display: none">
     <table>
       <tr>

@@ -58,7 +58,7 @@ module Pampero
     include JSON::Serializable
 
     @[JSON::Field(key: "Optional[]")]
-    property value : String
+    property value : String?
   end
 
   struct VerkleProof
