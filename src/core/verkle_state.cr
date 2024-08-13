@@ -12,7 +12,11 @@ module Pampero
         state_diff.suffix_diffs.map do |suffix_diff|
           suffix = suffix_diff.suffix
           if suffix.is_a?(String)
-            suffix = suffix[2..].to_i(16)
+            suffix = if suffix[0] == "0" && (suffix[1] == "x" || suffix[1] == "X")
+              suffix[2..].to_i(16)
+            else
+              suffix.to_i
+            end
           end
           key = Bytes32.new sprintf("%s%02x", stem, suffix)
           current_value = suffix_diff.current_value

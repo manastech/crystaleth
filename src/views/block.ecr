@@ -2,8 +2,13 @@
 
 <h3>Info</h3>
 
-<a href="/block/<%= block.data.message.slot.to_i - 1 %>">Prev. Slot</a>
-<a href="/block/<%= block.data.message.slot.to_i + 1 %>">Next Slot</a>
+<div class="blocks-navigation">
+  <ul>
+    <li><a href="/block/<%= block.data.message.slot.to_i - 1 %>">Prev. Slot</a></li>
+    <li><a href="/block/<%= block.data.message.slot.to_i + 1 %>">Next Slot</a></li>
+    <li><a href="/block/latest">Latest</a></li>
+  </ul>
+</div>
 
 <table>
   <tr>
@@ -44,10 +49,16 @@
 <form x-data="AccountForm(<%= block.data.message.slot %>)" @submit.prevent="submitForm">
   <input type="hidden" name="slot" value="" x-model="formData.slot" />
   <div>
-    <label>Address:</label>
-    <input type="text" name="address" required x-model="formData.address" />
+    <div>
+      <label>Address:</label>
+      <input type="text" name="address" required x-model="formData.address" />
+    </div>
+    <div>
+      <label>Storage:</label>
+      <input type="text" name="storageKey" x-model="formData.storageKey" />
+    </div>
   </div>
-  <button>Load</button>
+  <button :disabled="formLoading" x-text="submitText"></button>
   <div x-show="formData.account" style="display: none">
     <table>
       <tr>
@@ -65,6 +76,14 @@
       <tr>
         <td>Code hash:</td>
         <td x-text="formData.account.code_hash"></td>
+      </tr>
+      <tr>
+        <td>Bytecode:</td>
+        <td x-text="formData.account.bytecode"></td>
+      </tr>
+      <tr>
+        <td>Storage:</td>
+        <td x-text="formData.account.storage_value"></td>
       </tr>
     </table>
   </div>

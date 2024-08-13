@@ -3,7 +3,7 @@
 	--u2: calc(2 * var(--u1));
 	--u3: calc(3 * var(--u1));
 
-	--gray-1: #c3c3c3;	
+	--gray-1: #c3c3c3;
 }
 
 pre {
@@ -14,13 +14,14 @@ table {
 	border-collapse: collapse;
 }
 
-td, th {
+td,
+th {
 	font-family: monospace;
 	padding: var(--u1) var(--u2) var(--u1) var(--u2);
 }
 
 tr.stem td {
-	border-top: solid 0.1rem var(--gray-1);	
+	border-top: solid 0.1rem var(--gray-1);
 }
 
 tr.stem td.suffix {
@@ -29,4 +30,23 @@ tr.stem td.suffix {
 
 tr.stem-end td {
 	padding-bottom: var(--u3);
+}
+
+.blocks-navigation {
+	ul {
+		list-style: none;
+		display: flex;
+		padding: 0;
+
+		li {
+			padding: 0;
+			display: flex;
+
+			a {
+				display: flex;
+				align-items: center;
+				padding: 0 0.1rem;
+			}
+		}
+	}
 }
