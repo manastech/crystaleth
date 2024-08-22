@@ -1,6 +1,10 @@
+## Requiriements
+
+A recent version of [Crystal](https://crystal-lang.org/install) and [Rust](https://www.rust-lang.org/tools/install).
+
 ## Building
 
-Instruction for building crystal project and rust library
+Instruction for building crystal project and the `verke_crypto` rust library it depends on.
 
 ```sh
 $ (cd verkle_crypto; cargo build --release) 
