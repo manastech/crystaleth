@@ -1,5 +1,6 @@
 require "../common/types"
 require "../common/constants"
+require "json"
 
 module Pampero
   struct Account
