@@ -41,9 +41,7 @@ module Pampero
       code_size = result[:code_size]
 
       # If at least one of the fields is not nil we assume the account exists
-      if version.nil? && balance.nil? && nonce.nil? && code_hash.nil? && code_size.nil?
-        return nil
-      end
+      return nil if version.nil? && balance.nil? && nonce.nil? && code_hash.nil? && code_size.nil?
 
       account = Account.new
       account.version = version
