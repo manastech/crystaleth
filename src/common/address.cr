@@ -39,9 +39,9 @@ module Pampero
   # To obtain a workable object, `check_format` needs to be over-
   # loaded to check that the address' format is correct.
   abstract struct Address
-    getter :bytes
-    getter :to_i
-    getter :little
+    getter bytes
+    getter to_i
+    getter little
 
     @str : String = ""
 
