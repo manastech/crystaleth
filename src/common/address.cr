@@ -81,13 +81,13 @@ module Pampero
     end
 
     def to_s
-      hex_str()
+      hex_str
     end
 
     def from_bytes(bytes : Array(UInt8))
       @bytes = bytes
 
-      if check_format()
+      if check_format
         # Calculates the integral version
         @to_i = BigInt.new(0)
         (@little ? @bytes.reverse : @bytes).each do |b|
