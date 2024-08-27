@@ -73,19 +73,19 @@ module Pampero
     end
 
     def to_s : String
-      to_hex()
+      to_hex
     end
 
     def inspect : String
-      to_hex()
+      to_hex
     end
 
     def to_json(json : JSON::Builder) : Nil
-      json.string(to_hex())
+      json.string(to_hex)
     end
 
     def to_json_object_key : String
-      to_hex()
+      to_hex
     end
   end
 

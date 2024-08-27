@@ -16,7 +16,7 @@ module Pampero
   VERKLE_NODE_WIDTH = BigInt.new(256)
 
   HEADER_STORAGE_OFFSET = BigInt.new(64)
-  MAIN_STORAGE_OFFSET = VERKLE_NODE_WIDTH^31
+  MAIN_STORAGE_OFFSET   = VERKLE_NODE_WIDTH ^ 31
 
   CHUNK_LENGTH = BigInt.new(31)
 
@@ -148,10 +148,10 @@ module Pampero
 
     def get_tree_storage_key(address : Address20, storage_key : UInt256) : Bytes32
       position = if storage_key < CODE_OFFSET - HEADER_STORAGE_OFFSET
-        HEADER_STORAGE_OFFSET + storage_key
-      else
-        MAIN_STORAGE_OFFSET + storage_key
-      end
+                   HEADER_STORAGE_OFFSET + storage_key
+                 else
+                   MAIN_STORAGE_OFFSET + storage_key
+                 end
 
       calc_tree_key(address, position)
     end
