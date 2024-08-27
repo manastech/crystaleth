@@ -32,13 +32,11 @@ module Pampero
     def get_account(address : Address20) : Account?
       stem = get_stem(address, UInt256.new(0))
 
-      result = read_account(stem)
-
-      version = result[:version]
-      balance = result[:balance]
-      nonce = result[:nonce]
-      code_hash = result[:code_hash]
-      code_size = result[:code_size]
+      version = read_version(stem)
+      balance = read_balance(stem)
+      nonce = read_nonce(stem)
+      code_hash = read_code_hash(stem)
+      code_size = read_code_size(stem)
 
       # If at least one of the fields is not nil we assume the account exists
       return nil if version.nil? && balance.nil? && nonce.nil? && code_hash.nil? && code_size.nil?
@@ -127,16 +125,6 @@ module Pampero
       index = Bytes32.new treeIndex
 
       get_tree_key address32, index, 0_u8
-    end
-
-    def read_account(stem : Bytes32)
-      {
-        version:   read_version(stem),
-        balance:   read_balance(stem),
-        nonce:     read_nonce(stem),
-        code_hash: read_code_hash(stem),
-        code_size: read_code_size(stem),
-      }
     end
 
     def get_tree_key(address : Address32, treeIndex : Bytes32, subIndex : UInt8) : Bytes32
