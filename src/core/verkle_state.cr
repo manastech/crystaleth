@@ -35,17 +35,14 @@ module Pampero
       end
     end
 
-    def get_leaf_value(leaf : String | LeafValue?) : Bytes32?
-      result = nil
-      if leaf.is_a?(String)
-        result = Bytes32.new(leaf)
-      elsif leaf.is_a?(LeafValue)
-        value = leaf.value
-        if value
-          result = Bytes32.new(value)
-        end
+    def get_leaf_value(leaf : String) : Bytes32
+      Bytes32.new leaf
+    end
+
+    def get_leaf_value(leaf : LeafValue) : Bytes32?
+      if value = leaf.value
+        Bytes32.new(value)
       end
-      result
     end
 
     def read_key(key : Bytes32) : Bytes32?
