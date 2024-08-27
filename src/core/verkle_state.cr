@@ -18,19 +18,11 @@ module Pampero
           end
           key = Bytes32.new sprintf("%s%02x", stem, suffix)
 
-          current_value = get_leaf_value(suffix_diff.current_value)
-          if current_value
-            @state[key] = current_value
-          else
-            @state.delete key
-          end
+          current_value = suffix_diff.current_value.try { |x| get_leaf_value x }
+          write_key key, current_value
 
-          new_value = get_leaf_value(suffix_diff.new_value)
-          if new_value
-            @pos_state[key] = new_value
-          else
-            @pos_state.delete key
-          end
+          new_value = suffix_diff.new_value.try { |x| get_leaf_value x }
+          write_key key, new_value
         end
       end
     end
