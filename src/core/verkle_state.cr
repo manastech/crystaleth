@@ -22,7 +22,11 @@ module Pampero
           write_key key, current_value
 
           new_value = suffix_diff.new_value.try { |x| get_leaf_value x }
-          write_key key, new_value
+          if new_value
+            @pos_state[key] = new_value
+          else
+            @pos_state.delete key
+          end
         end
       end
     end
