@@ -13,12 +13,8 @@ module Pampero
         state_diff.suffix_diffs.map do |suffix_diff|
           suffix = suffix_diff.suffix
           if suffix.is_a?(String)
-            is_hex = suffix[0] == '0' && (suffix[1] == 'x' || suffix[1] == 'X')
-            suffix = if is_hex
-              suffix[2..].to_i(16)
-            else
-              suffix.to_i
-            end
+            is_hex = suffix[0] == '0' && (suffix[1].downcase == 'x')
+            suffix = is_hex ? suffix[2..].to_i(16) : suffix.to_i
           end
           key = Bytes32.new sprintf("%s%02x", stem, suffix)
 
