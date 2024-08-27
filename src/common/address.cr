@@ -24,6 +24,7 @@
 # For more information, please refer to <http://unlicense.org>
 
 require "./types"
+require "./string"
 
 require "big"
 
@@ -56,7 +57,7 @@ module Pampero
     # order
     def initialize(str : String, @little : Bool = false)
       # Remove the header, not supported by BigInt.new
-      str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
+      str = str.hexstring
 
       @to_i = BigInt.new(str, 16)
       @bytes = Array(UInt8).new(str.size.as(Int) >> 1, 0u8)
