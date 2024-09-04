@@ -1,5 +1,7 @@
 require "big"
 
+require "./string_helper"
+
 module Pampero
   alias Address32 = StaticArray(UInt8, 32)
   # Integers are little endian
@@ -14,12 +16,11 @@ module Pampero
 
     def initialize(str : String)
       @data = uninitialized StaticArray(UInt8, 20)
-      str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
-      if str.size != 40
-        raise "Invalid format"
-      end
+      str = StringHelper.hexstring str
+      raise "Invalid format: string has #{str.size} size, but must be 40" if str.size != 40
+
       20.times do |i|
-        @data[i] = str[2*i..2*i+1].to_u8(16)
+        @data[i] = str[2*i..2*i + 1].to_u8(16)
       end
     end
   end
@@ -47,19 +48,18 @@ module Pampero
 
     def initialize(str : String)
       @data = uninitialized StaticArray(UInt8, 32)
-      str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
-      if str.size != 64
-        raise "Invalid format"
-      end
+      str = StringHelper.hexstring str
+      raise "Invalid format: string has #{str.size} size, but must be 64" if str.size != 64
+
       32.times do |i|
-        @data[i] = str[2*i..2*i+1].to_u8(16)
+        @data[i] = str[2*i..2*i + 1].to_u8(16)
       end
     end
 
     def to_uint256 : UInt256
       result = BigInt.new 0
       32.times do |i|
-        result = result * 256 + @data[31-i]
+        result = result * 256 + @data[31 - i]
       end
       result
     end
@@ -75,19 +75,19 @@ module Pampero
     end
 
     def to_s : String
-      to_hex()
+      to_hex
     end
 
     def inspect : String
-      to_hex()
+      to_hex
     end
 
     def to_json(json : JSON::Builder) : Nil
-      json.string(to_hex())
+      json.string(to_hex)
     end
 
     def to_json_object_key : String
-      to_hex()
+      to_hex
     end
   end
 

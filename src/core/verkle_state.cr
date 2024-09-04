@@ -13,23 +13,15 @@ module Pampero
         state_diff.suffix_diffs.map do |suffix_diff|
           suffix = suffix_diff.suffix
           if suffix.is_a?(String)
-            is_hex = suffix[0] == '0' && (suffix[1] == 'x' || suffix[1] == 'X')
-            suffix = if is_hex
-              suffix[2..].to_i(16)
-            else
-              suffix.to_i
-            end
+            is_hex = suffix[0] == '0' && (suffix[1].downcase == 'x')
+            suffix = is_hex ? suffix[2..].to_i(16) : suffix.to_i
           end
           key = Bytes32.new sprintf("%s%02x", stem, suffix)
 
-          current_value = get_leaf_value(suffix_diff.current_value)
-          if current_value
-            @state[key] = current_value
-          else
-            @state.delete key
-          end
+          current_value = suffix_diff.current_value.try { |x| get_leaf_value x }
+          write_key key, current_value
 
-          new_value = get_leaf_value(suffix_diff.new_value)
+          new_value = suffix_diff.new_value.try { |x| get_leaf_value x }
           if new_value
             @pos_state[key] = new_value
           else
@@ -39,17 +31,14 @@ module Pampero
       end
     end
 
-    def get_leaf_value(leaf : String | LeafValue?) : Bytes32?
-      result = nil
-      if leaf.is_a?(String)
-        result = Bytes32.new(leaf)
-      elsif leaf.is_a?(LeafValue)
-        value = leaf.value
-        if value
-          result = Bytes32.new(value)
-        end
+    def get_leaf_value(leaf : String) : Bytes32
+      Bytes32.new leaf
+    end
+
+    def get_leaf_value(leaf : LeafValue) : Bytes32?
+      if value = leaf.value
+        Bytes32.new(value)
       end
-      result
     end
 
     def read_key(key : Bytes32) : Bytes32?

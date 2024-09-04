@@ -24,6 +24,7 @@
 # For more information, please refer to <http://unlicense.org>
 
 require "./types"
+require "./string_helper"
 
 require "big"
 
@@ -38,9 +39,9 @@ module Pampero
   # To obtain a workable object, `check_format` needs to be over-
   # loaded to check that the address' format is correct.
   abstract struct Address
-    getter :bytes
-    getter :to_i
-    getter :little
+    getter bytes
+    getter to_i
+    getter little
 
     @str : String = ""
 
@@ -56,7 +57,7 @@ module Pampero
     # order
     def initialize(str : String, @little : Bool = false)
       # Remove the header, not supported by BigInt.new
-      str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
+      str = StringHelper.hexstring str
 
       @to_i = BigInt.new(str, 16)
       @bytes = Array(UInt8).new(str.size.as(Int) >> 1, 0u8)
@@ -80,13 +81,13 @@ module Pampero
     end
 
     def to_s
-      hex_str()
+      hex_str
     end
 
     def from_bytes(bytes : Array(UInt8))
       @bytes = bytes
 
-      if check_format()
+      if check_format
         # Calculates the integral version
         @to_i = BigInt.new(0)
         (@little ? @bytes.reverse : @bytes).each do |b|

@@ -16,7 +16,7 @@ module Pampero
   VERKLE_NODE_WIDTH = BigInt.new(256)
 
   HEADER_STORAGE_OFFSET = BigInt.new(64)
-  MAIN_STORAGE_OFFSET = VERKLE_NODE_WIDTH^31
+  MAIN_STORAGE_OFFSET   = VERKLE_NODE_WIDTH ^ 31
 
   CHUNK_LENGTH = BigInt.new(31)
 
@@ -32,18 +32,14 @@ module Pampero
     def get_account(address : Address20) : Account?
       stem = get_stem(address, UInt256.new(0))
 
-      result = read_account(stem)
-
-      version = result[:version]
-      balance = result[:balance]
-      nonce = result[:nonce]
-      code_hash = result[:code_hash]
-      code_size = result[:code_size]
+      version = read_version(stem)
+      balance = read_balance(stem)
+      nonce = read_nonce(stem)
+      code_hash = read_code_hash(stem)
+      code_size = read_code_size(stem)
 
       # If at least one of the fields is not nil we assume the account exists
-      if version.nil? && balance.nil? && nonce.nil? && code_hash.nil? && code_size.nil?
-        return nil
-      end
+      return nil if version.nil? && balance.nil? && nonce.nil? && code_hash.nil? && code_size.nil?
 
       account = Account.new
       account.version = version
@@ -131,16 +127,6 @@ module Pampero
       get_tree_key address32, index, 0_u8
     end
 
-    def read_account(stem : Bytes32)
-      {
-        version:   read_version(stem),
-        balance:   read_balance(stem),
-        nonce:     read_nonce(stem),
-        code_hash: read_code_hash(stem),
-        code_size: read_code_size(stem),
-      }
-    end
-
     def get_tree_key(address : Address32, treeIndex : Bytes32, subIndex : UInt8) : Bytes32
       data = Bytes64.new address, treeIndex.@data
       key = Pampero::Crypto.hash data
@@ -150,10 +136,10 @@ module Pampero
 
     def get_tree_storage_key(address : Address20, storage_key : UInt256) : Bytes32
       position = if storage_key < CODE_OFFSET - HEADER_STORAGE_OFFSET
-        HEADER_STORAGE_OFFSET + storage_key
-      else
-        MAIN_STORAGE_OFFSET + storage_key
-      end
+                   HEADER_STORAGE_OFFSET + storage_key
+                 else
+                   MAIN_STORAGE_OFFSET + storage_key
+                 end
 
       calc_tree_key(address, position)
     end
