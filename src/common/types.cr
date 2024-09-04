@@ -1,5 +1,7 @@
 require "big"
 
+require "./string_helper"
+
 module Pampero
   alias Address32 = StaticArray(UInt8, 32)
   # Integers are little endian
@@ -14,7 +16,7 @@ module Pampero
 
     def initialize(str : String)
       @data = uninitialized StaticArray(UInt8, 20)
-      str = str.hexstring
+      str = StringHelper.hexstring str
       raise "Invalid format: string has #{str.size} size, but must be 40" if str.size != 40
 
       20.times do |i|
@@ -46,7 +48,7 @@ module Pampero
 
     def initialize(str : String)
       @data = uninitialized StaticArray(UInt8, 32)
-      str = str.hexstring
+      str = StringHelper.hexstring str
       raise "Invalid format: string has #{str.size} size, but must be 64" if str.size != 64
 
       32.times do |i|
